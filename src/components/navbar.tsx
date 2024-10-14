@@ -7,8 +7,8 @@ export function Navbar() {
   const pathname = usePathname()
 
   return (
-    <nav className="flex h-full  items-start justify-center pt-3 mt-16">
-      <ul>
+    <nav className="flex h-full items-start justify-center pt-3 mt-16">
+      <ul className="space-y-2">
         <li className="mb-10">
           <Link
             href="/"
@@ -17,7 +17,15 @@ export function Navbar() {
             Selecione o local
           </Link>
         </li>
-        <NavItem href="frigo-apms" name="Frigo APMS" />
+        <NavItem
+          href="frigo-apms"
+          options={[
+            { name: 'Desossa', query: 'desossa' },
+            { name: 'Abate', query: 'abate' },
+            { name: 'T.I', query: 'ti' },
+          ]}
+          name="Frigo APMS"
+        />
         <NavItem href="frigo-apsp" name="Frigo APSP" />
         <NavItem href="frigo-vgmt" name="Frigo VGMT" />
         <NavItem href="frigo-vmrs" name="Frigo VMRS" />

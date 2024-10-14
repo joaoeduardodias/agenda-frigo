@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className="flex flex-1 flex-col  mt-10  items-center justify-between">
       <h1 className="text-2xl tracking-tighter text-primary mb-20">
-        Achar o Contato Certo Nunca Foi Tão Fácil!
+        Encontrar o Contato Certo Nunca Foi Tão Fácil!
       </h1>
       <Image
         src={illustration}
