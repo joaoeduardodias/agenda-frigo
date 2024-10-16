@@ -1,0 +1,11 @@
+
+services:
+  db:
+    image: postgres:17 
+    container_name: postgres_db_agend
+    environment:
+      POSTGRES_USER: admin 
+      POSTGRES_PASSWORD: admin 
+      POSTGRES_DB: agenda_frigo_db # Nome do banco de dados a ser criado automaticamente
+    ports:
+      - "5432:5432"
