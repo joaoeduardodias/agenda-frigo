@@ -3,17 +3,21 @@ import { NextRequest, NextResponse } from 'next/server'
 const prisma = new PrismaClient()
 
 export async function PUT(req: NextRequest) {
-  const { name, email, userRole } = await req.json()
-  const userId = req.nextUrl.searchParams.get('userId')!
 
-  if (!name || !email || !userRole) {
-    return NextResponse.json(
-      { message: 'name or email  or user role missing' },
-      { status: 400 },
-    )
-  }
   try {
+    const userId = req.nextUrl.searchParams.get('userId')!
+
+    const { name, email, password, userRole, contact, enterprise, sector } = await req.json()
+
+    if (!name || !email || !password || !userRole || !enterprise || !contact || !sector) {
+      return NextResponse.json(
+        { message: 'Missing data' },
+        { status: 400 },
+      )
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { id: userId } })
+
     if (!existingUser) {
       return NextResponse.json({ message: 'User not exist' }, { status: 404 })
     }
@@ -23,7 +27,16 @@ export async function PUT(req: NextRequest) {
       data: {
         name,
         email,
+        contact,
         userRole,
+        enterprise: {
+          connect: {
+            id: enterprise
+          }
+        },
+        sectors: {
+          connect: { name: sector }
+        }
       },
     })
 

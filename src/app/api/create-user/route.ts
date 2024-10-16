@@ -4,15 +4,17 @@ import { NextRequest, NextResponse } from 'next/server'
 const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest) {
-  const { name, email, password, userRole } = await req.json()
 
-  if (!name || !email || !password || !userRole) {
-    return NextResponse.json(
-      { message: 'name or email or password or user role missing' },
-      { status: 400 },
-    )
-  }
   try {
+    const { name, email, password, userRole, contact, enterprise, sector } = await req.json()
+
+    if (!name || !email || !password || !userRole || !enterprise || !contact || !sector) {
+      return NextResponse.json(
+        { message: 'Missing data' },
+        { status: 400 },
+      )
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) {
       return NextResponse.json(
@@ -20,6 +22,8 @@ export async function POST(req: NextRequest) {
         { status: 409 },
       )
     }
+
+
 
     const hashedPassword = await bcrypt.hash(password, 8)
 
@@ -29,6 +33,15 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         userRole,
+        enterprise: {
+          connect: {
+            id: enterprise
+          }
+        },
+        contact,
+        sectors: {
+          connect: { name: sector }
+        }
       },
     })
 
