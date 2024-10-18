@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 export async function POST(req: NextRequest) {
 
   try {
-    const { name, email, password, userRole, contact, enterprise, sector } = await req.json()
+    const { name, email, password, userRole, contact, contact_secondary, enterprise, sector } = await req.json()
 
     if (!name || !email || !password || !userRole || !enterprise || !contact || !sector) {
       return NextResponse.json(
@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
         email,
         password: hashedPassword,
         userRole,
+        contact_secondary,
         enterprise: {
           connect: {
             id: enterprise
