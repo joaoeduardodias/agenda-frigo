@@ -8,12 +8,13 @@ export async function POST(req: NextRequest) {
   try {
     const { name, email, password, userRole, contact, contact_secondary, enterprise, sector } = await req.json()
 
-    if (!name || !email || !password || !userRole || !enterprise || !contact || !sector) {
+    if (!name || !email || !password || !enterprise || !contact || !sector) {
       return NextResponse.json(
         { message: 'Missing data' },
         { status: 400 },
       )
     }
+
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) {
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        userRole,
+        userRole: !userRole ? 'user' : userRole,
         contact_secondary,
         enterprise: {
           connect: {
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ user }, { status: 201 })
   } catch (error) {
+
     return NextResponse.json(
       { error: 'Error creating user', details: error },
       { status: 500 },

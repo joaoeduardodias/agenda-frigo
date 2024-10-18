@@ -1,5 +1,13 @@
+"use client"
+import { createUser } from "@/app/http/create-user";
+import { getEnterprises } from "@/app/http/get-enterprises";
+import { getSectorsByEnterprise } from "@/app/http/get-sectors-by-enterprise";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CircleCheck, CircleX } from 'lucide-react';
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useHookFormMask } from 'use-mask-input';
 import { z } from "zod";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -12,28 +20,95 @@ const signUpSchema = z.object({
   password: z
     .string({ message: "Digite sua senha" })
     .min(8, { message: 'A  senha deve ter no mínimo 08 caracteres' }),
-
-  contact: z.number({ message: "Digite seu número" }).min(1, { message: "O ramal deve ter mais de 01 dígito" }).max(4, { message: "O ramal deve ter 4 digitos" }),
-  contact_secondary: z.number({ message: "Digite seu número" }).min(3, { message: "O número deve ter mais  de 08 dígitos" }),
+  contact: z.string({ message: "Digite seu ramal" }),
+  contact_secondary: z.string().optional(),
   enterprise: z.string({ message: "Selecione sua empresa" }),
   sector: z.string({ message: "Selecione o seu setor" }),
 
 })
 type SignUpData = z.infer<typeof signUpSchema>
 
-export async function FormSignUp() {
-
+export function FormSignUp() {
   const {
     register,
     handleSubmit,
     control,
+    watch,
+    reset,
     formState: { errors }
   } = useForm<SignUpData>({
     resolver: zodResolver(signUpSchema),
   })
+  const registerWithMask = useHookFormMask(register);
 
+  const queryClient = useQueryClient()
+  const createUserMutation = useMutation({
+    mutationFn: createUser,
+    onSuccess: async ({ message }) => {
+      console.log(message)
+      switch (message) {
+        case "User already exists":
+          toast.error('Usuário já existente!', {
+            richColors: true,
+            position: 'top-right',
+            icon: <CircleX />,
+          });
+          break;
+
+        case "Missing data":
+          toast.error('Dados faltando, por favor verifique', {
+            richColors: true,
+            position: 'top-right',
+            icon: <CircleX />,
+          });
+          break;
+
+        default:
+          await queryClient.invalidateQueries({ queryKey: ['get-users'] });
+          toast.success('Usuário cadastrado com sucesso', {
+            richColors: true,
+            position: 'top-right',
+            icon: <CircleCheck />
+          });
+      }
+    },
+    onError: (error) => {
+      toast.error('Erro encontrado, por favor tente novamente: ' + error.message, {
+        richColors: true,
+        position: 'top-right',
+        icon: <CircleX />,
+      })
+      console.log('error' + error.message)
+
+    }
+  })
+
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['get-enterprises'],
+    queryFn: getEnterprises,
+    staleTime: 1000 * 60 * 60 // 1hour
+  })
+
+  const enterpriseId = watch('enterprise')
+  const { data: dataSector, isLoading: loadingSectors } = useQuery({
+    queryKey: ['get-sectors', enterpriseId],
+    queryFn: () => getSectorsByEnterprise({ enterpriseId }),
+    staleTime: 1000 * 60 * 60, // 1hour
+    enabled: !!enterpriseId
+  })
   function handleSignUp(data: SignUpData) {
-    console.log(data)
+
+    createUserMutation.mutateAsync({
+      contact: data.contact,
+      contact_secondary: data.contact_secondary,
+      name: data.name,
+      email: data.email,
+      enterprise: data.enterprise,
+      password: data.password,
+      sector: data.sector
+    })
+    reset()
   }
   return (
     <form className='mt-2 flex flex-col' onSubmit={handleSubmit(handleSignUp)}>
@@ -66,7 +141,7 @@ export async function FormSignUp() {
       </div>
       <div className="space-y-1">
         <Label className='ml-1'>Ramal</Label>
-        <Input type="number" id='contact' {...register('contact')} placeholder="0000" className="[appearance:textfield]  [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+        <Input type="tel" id='contact' {...registerWithMask('contact', ['9999'])} placeholder="0000" className="[appearance:textfield]  [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
         {errors.contact?.message && (
           <p className="text-red-500 text-sm font-light">
             {errors.contact?.message}
@@ -75,7 +150,8 @@ export async function FormSignUp() {
       </div>
       <div className="space-y-1">
         <Label className='ml-1'>Contato</Label>
-        <Input type="tel" id='contact_secondary' {...register('contact_secondary')} placeholder="(00) 00000-0000" className="[appearance:textfield]  [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+
+        <Input type="text" id='contact_secondary' {...registerWithMask('contact_secondary', ['(99) 99999-9999', '99999-9999'])} placeholder="(00) 00000-0000" />
         {errors.contact_secondary?.message && (
           <p className="text-red-500 text-sm font-light">
             {errors.contact_secondary?.message}
@@ -88,18 +164,17 @@ export async function FormSignUp() {
           name="enterprise"
           control={control}
           render={({ field: { onChange, value, ref } }) => (
-            <Select onValueChange={onChange} value={value} name="enterprise">
+            <Select onValueChange={onChange} value={value} name="enterprise" disabled={isLoading}>
               <SelectTrigger ref={ref}>
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
-                {/* {Object.entries(enterprises).map(([value, name]) => (
-                  <SelectItem key={value} value={value}>
-                    {name}
-                  </SelectItem>
-                ))} */}
-                <SelectItem value="frigoapms">Frigo apms</SelectItem>
-                <SelectItem value="frigoapsp">Frigo apsp</SelectItem>
+                {data?.enterprises.map(enterprise => {
+                  return (
+                    <SelectItem key={enterprise.id} value={enterprise.id}>{enterprise.name} - {enterprise.city} {enterprise.uf}</SelectItem>
+                  )
+                })
+                }
               </SelectContent>
             </Select>
           )}
@@ -116,18 +191,17 @@ export async function FormSignUp() {
           name="sector"
           control={control}
           render={({ field: { onChange, value, ref } }) => (
-            <Select onValueChange={onChange} value={value} name="sector">
+            <Select onValueChange={onChange} value={value} name="sector" disabled={loadingSectors}>
               <SelectTrigger ref={ref}>
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
-                {/* {Object.entries(sectors).map(([value, name]) => (
-                  <SelectItem key={value} value={value}>
-                    {name}
-                  </SelectItem>
-                ))} */}
-                <SelectItem value="abate">Abate</SelectItem>
-                <SelectItem value="desossa">Desossa</SelectItem>
+                {dataSector?.sectors.map(sector => {
+                  return (
+                    <SelectItem key={sector.id} value={sector.name} >{sector.name}</SelectItem>
+                  )
+                })
+                }
               </SelectContent>
             </Select>
           )}

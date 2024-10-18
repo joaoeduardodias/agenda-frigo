@@ -1,5 +1,6 @@
 import { Header } from '@/components/header'
 import { Navbar } from '@/components/navbar'
+import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
 import { ReactQueryProvider } from '@/providers/react-query-provider'
 import type { Metadata } from 'next'
@@ -30,6 +31,7 @@ export default function RootLayout({
         )}
       >
         <ReactQueryProvider>
+          <Toaster />
           <div className="flex w-screen min-h-screen">
             <aside className="min-h-full w-60 flex  justify-center border-r">
               <Navbar />
