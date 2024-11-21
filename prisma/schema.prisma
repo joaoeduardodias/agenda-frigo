@@ -13,8 +13,8 @@ model User {
   email             String     @unique
   password          String
   userRole          String?
-  contact           String
-  contact_secondary String?
+  contact           Float
+  contact_secondary Float?
   enterprise        Enterprise @relation(fields: [enterprise_id], references: [id])
   enterprise_id     String
   sectors           Sector     @relation(fields: [sector_id], references: [id])
@@ -25,16 +25,15 @@ model User {
 }
 
 model Enterprise {
-  id      String @id @default(uuid())
-  name    String
-  city    String
-  uf      String
-  contact String @unique
-
-  createdAt DateTime @default(now())
-
-  users   User[]
-  sectors SectorEnterprise[]
+  id        String             @id @default(uuid())
+  name      String
+  city      String
+  uf        String
+  contact   Float              @unique
+  zipCode   Float?
+  createdAt DateTime           @default(now())
+  users     User[]
+  sectors   SectorEnterprise[]
 
   @@map("enterprises")
 }

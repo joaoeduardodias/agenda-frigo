@@ -3,10 +3,22 @@ import bcrypt from 'bcrypt'
 import { NextRequest, NextResponse } from 'next/server'
 const prisma = new PrismaClient()
 
+interface CreateUserProps {
+  name: string
+  email: string
+  password: string
+  userRole: "adm" | "user"
+  contact: number
+  contact_secondary: number
+  enterprise?: string
+  sector?: string
+}
+
+
 export async function POST(req: NextRequest) {
 
   try {
-    const { name, email, password, userRole, contact, contact_secondary, enterprise, sector } = await req.json()
+    const { name, email, password, userRole, contact, contact_secondary, enterprise, sector }: CreateUserProps = await req.json()
 
     if (!name || !email || !password || !enterprise || !contact || !sector) {
       return NextResponse.json(

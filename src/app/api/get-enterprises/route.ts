@@ -15,6 +15,4 @@ export async function GET() {
     return NextResponse.json({ message: "Error get all enterprises", error }, { status: 500 })
   }
 
-
-
 }

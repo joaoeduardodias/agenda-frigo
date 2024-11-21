@@ -1,5 +1,6 @@
 import { Header } from '@/components/header'
-import { Navbar } from '@/components/navbar'
+import { AppSidebar } from '@/components/sidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
 import { ReactQueryProvider } from '@/providers/react-query-provider'
@@ -31,16 +32,15 @@ export default function RootLayout({
         )}
       >
         <ReactQueryProvider>
-          <Toaster />
-          <div className="flex w-screen min-h-screen">
-            <aside className="min-h-full w-60 flex  justify-center border-r">
-              <Navbar />
-            </aside>
-            <div className="flex-1 h-full flex flex-col">
+          <SidebarProvider>
+            <Toaster />
+            <AppSidebar />
+            <div className="h-screen w-full flex flex-col">
               <Header />
               {children}
             </div>
-          </div>
+
+          </SidebarProvider>
         </ReactQueryProvider>
 
       </body>

@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 interface EnterpriseRequest {
   name: string;
   city: string;
-  contact: string;
+  contact: number;
   uf: string;
   sectors: string[];
 }

@@ -6,16 +6,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { TableHeaderPage } from './components/table-header'
 
-export default function FrigoVGMT() {
+export default function PageList() {
+
+
+
+
+
   return (
-    <main className="flex flex-col flex-1 h-full items-start justify-center p-6 pt-20">
-      <div className="max-w-screen-lg w-full mx-auto flex justify-between px-2 pb-1">
-        <h2 className=" font-semibold tracking-tighter text-primary">
-          Frigosul - Várzea Grande-MT
-        </h2>
-        <p className="text-primary">(65) 3625-5257</p>
-      </div>
+    <main className="flex flex-col flex-1 h-full items-start pt-10">
+      <TableHeaderPage />
       <Table className="max-w-screen-lg mx-auto border border-collapse rounded-md">
         <TableHeader>
           <TableRow className="h-11">
@@ -30,8 +31,8 @@ export default function FrigoVGMT() {
           {Array.from({ length: 10 }).map((_, index) => {
             return (
               <TableRow key={index} className="h-10">
-                <TableCell className="border ">João Dias</TableCell>
-                <TableCell className="border ">
+                <TableCell className="border">João Dias</TableCell>
+                <TableCell className="border">
                   suporte2.apms@frigosul.com.br
                 </TableCell>
                 <TableCell className="border text-center">T.I</TableCell>
