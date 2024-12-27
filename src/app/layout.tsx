@@ -1,5 +1,4 @@
 import { Header } from '@/components/header'
-import { AppSidebar } from '@/components/sidebar'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import { cn } from '@/lib/utils'
@@ -14,8 +13,8 @@ const fontSans = FontSans({
 })
 
 export const metadata: Metadata = {
-  title: 'call.frig',
-  description: 'list telephones',
+  title: 'agenda',
+  description: 'agenda telefônica',
 }
 
 export default function RootLayout({
@@ -25,21 +24,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body
-        className={cn(
-          'min-h-screen bg-background font-sans antialiased overflow-hidden dark',
+      <body className={cn(
+          'min-h-screen bg-background font-sans antialiased',
           fontSans.variable,
-        )}
-      >
+        )}>
         <ReactQueryProvider>
           <SidebarProvider>
             <Toaster />
-            <AppSidebar />
             <div className="h-screen w-full flex flex-col">
               <Header />
               {children}
             </div>
-
           </SidebarProvider>
         </ReactQueryProvider>
 
