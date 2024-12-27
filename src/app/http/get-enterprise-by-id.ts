@@ -1,28 +1,37 @@
 interface RequestGetEnterpriseById {
-  enterpriseId: string
+  enterpriseId: string;
 }
 
 export interface ResponseGetEnterpriseById {
   enterprise: {
-    id: string
-    name: string
-    city: string
-    uf: string,
-    contact: number,
+    id: string;
+    name: string;
+    city: string;
+    uf: string;
+    contact: number;
     users: {
-      id: string
-      name: string
-      email: string
-      contact: number,
-      contact_secondary: number | null,
-      sectors: string
-    }[]
+      id: string;
+      name: string;
+      email: string;
+      contact: number;
+      contact_secondary: number | null;
+      sectors: string;
+    }[];
+  };
+}
+[];
 
+export async function getEnterpriseById({
+  enterpriseId,
+}: RequestGetEnterpriseById): Promise<ResponseGetEnterpriseById> {
+  const response = await fetch(`/api/get-enterprise-by-id?id=${enterpriseId}`);
+  if (!response.ok) {
+    const error = await response.json();
+    return Promise.reject({
+      status: response.status,
+      message: error.message || "Error api",
+    });
   }
-}[]
-
-export async function getEnterpriseById({ enterpriseId }: RequestGetEnterpriseById): Promise<ResponseGetEnterpriseById> {
-  const response = await fetch(`/api/get-enterprise-by-id?id=${enterpriseId}`)
-  const data = await response.json()
-  return data
+  const data = await response.json();
+  return data;
 }

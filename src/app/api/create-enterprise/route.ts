@@ -1,6 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { NextResponse } from 'next/server';
-
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
 
 interface EnterpriseRequest {
   name: string;
@@ -8,18 +7,38 @@ interface EnterpriseRequest {
   contact: number;
   uf: string;
   sectors: string[];
+  zipCode: number;
 }
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
-    const { name, city, contact, uf, sectors }: EnterpriseRequest = await request.json();
+    const { name, city, contact, uf, sectors, zipCode }: EnterpriseRequest =
+      await request.json();
 
-
-    if (!name || !city || !uf || !contact || !sectors || !Array.isArray(sectors)) {
-      return NextResponse.json({ error: 'Missing data' }, { status: 400 });
+    if (
+      !name ||
+      !city ||
+      !uf ||
+      !contact ||
+      !sectors ||
+      !zipCode ||
+      !Array.isArray(sectors)
+    ) {
+      return NextResponse.json({ error: "Missing data" }, { status: 400 });
     }
 
+    const existingEnterpriseWithNumber = await prisma.enterprise.findUnique({
+      where: {
+        contact,
+      },
+    });
+    if (existingEnterpriseWithNumber) {
+      return NextResponse.json(
+        { error: "Enterprise already existing with contact" },
+        { status: 409 }
+      );
+    }
 
     const enterprise = await prisma.enterprise.create({
       data: {
@@ -27,23 +46,31 @@ export async function POST(request: Request) {
         city,
         contact,
         uf,
+        zipCode,
         sectors: {
           create: sectors.map((sectorName) => ({
             sectors: {
               connectOrCreate: {
                 where: { name: sectorName },
-                create: { name: sectorName }
-              }
-            }
-          }))
-
+                create: { name: sectorName },
+              },
+            },
+          })),
         },
       },
     });
 
-    return NextResponse.json({ message: 'Enterprise criado com sucesso', enterprise });
+    return NextResponse.json({
+      message: "create enterprise",
+      enterprise,
+    });
   } catch (error) {
-    console.error('Erro ao criar enterprise:', error);
-    return NextResponse.json({ error: 'Erro ao processar a requisição', details: (error as Error).message }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "error ocurred",
+        details: (error as Error).message,
+      },
+      { status: 500 }
+    );
   }
 }

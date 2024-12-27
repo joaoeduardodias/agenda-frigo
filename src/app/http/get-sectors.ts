@@ -1,15 +1,20 @@
-
 export interface ResponseSectors {
   sectors: {
-    id: string
-    name: string
-  }[]
+    id: string;
+    name: string;
+  }[];
 }
 
 export async function getSectors(): Promise<ResponseSectors> {
-  const response = await fetch(`/api/get-sectors`)
+  const response = await fetch(`/api/get-sectors`);
 
-  const data = await response.json()
-
-  return data
+  if (!response.ok) {
+    const error = await response.json();
+    return Promise.reject({
+      status: response.status,
+      message: error.message || "Error api",
+    });
+  }
+  const data = await response.json();
+  return data;
 }

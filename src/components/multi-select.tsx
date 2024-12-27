@@ -14,7 +14,15 @@ interface SectorInputProps {
 }
 
 export const MultiSelect = forwardRef<HTMLDivElement, SectorInputProps>(
-  ({ sectors, placeholder = "Adicione os setores da empresa...", value = [], onChange }: SectorInputProps, ref) => {
+  (
+    {
+      sectors,
+      placeholder = "Adicione os setores da empresa...",
+      value = [],
+      onChange,
+    }: SectorInputProps,
+    ref
+  ) => {
     const [selectedSectors, setSelectedSectors] = useState<Sector[]>(value);
     const [query, setQuery] = useState("");
     const [filteredSectors, setFilteredSectors] = useState<Sector[]>(sectors);
@@ -37,14 +45,19 @@ export const MultiSelect = forwardRef<HTMLDivElement, SectorInputProps>(
     };
 
     const removeSector = (sector: Sector) => {
-      const updatedSectors = selectedSectors.filter((item) => item.id !== sector.id);
+      const updatedSectors = selectedSectors.filter(
+        (item) => item.id !== sector.id
+      );
       setSelectedSectors(updatedSectors);
       if (onChange) onChange(updatedSectors); // Atualiza o valor externo
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Enter" && query.trim() !== "") {
-        const newSector = { id: query.trim().toLowerCase(), name: query.trim() };
+        const newSector = {
+          id: query.trim().toLowerCase(),
+          name: query.trim(),
+        };
         addSector(newSector);
         e.preventDefault();
       }

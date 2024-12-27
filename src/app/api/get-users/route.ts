@@ -1,12 +1,10 @@
-import { PrismaClient } from "@prisma/client"
-import { NextResponse } from "next/server"
+import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
 
-
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-
     const users = await prisma.user.findMany({
       select: {
         name: true,
@@ -16,17 +14,17 @@ export async function GET() {
         email: true,
         enterprise: {
           select: {
-            name: true
-          }
+            name: true,
+          },
         },
         sectors: {
           select: {
-            name: true
-          }
-        }
-      }
-    })
-    const formattedUsers = users.map(user => ({
+            name: true,
+          },
+        },
+      },
+    });
+    const formattedUsers = users.map((user) => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -34,11 +32,12 @@ export async function GET() {
       contact_secondary: user.contact_secondary,
       enterprise: user.enterprise.name,
       sector: user.sectors.name,
-    }))
-    return NextResponse.json(formattedUsers, { status: 200 })
-
+    }));
+    return NextResponse.json(formattedUsers, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: "Error get all users", error }, { status: 500 })
+    return NextResponse.json(
+      { message: "Error get all users", error },
+      { status: 500 }
+    );
   }
-
 }

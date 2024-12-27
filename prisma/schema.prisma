@@ -49,11 +49,11 @@ model Sector {
 }
 
 model SectorEnterprise {
-  enterprises   Enterprise @relation(fields: [enterprise_id], references: [id])
-  enterprise_id String
-  sectors       Sector     @relation(fields: [sector_id], references: [id])
+  id            String      @id @default(uuid())
+  enterprises   Enterprise? @relation(fields: [enterprise_id], references: [id], onDelete: SetNull)
+  enterprise_id String?
+  sectors       Sector      @relation(fields: [sector_id], references: [id])
   sector_id     String
 
-  @@id([enterprise_id, sector_id])
   @@map("sector_enterprise")
 }
