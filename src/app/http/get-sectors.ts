@@ -12,7 +12,7 @@ export async function getSectors(): Promise<ResponseSectors> {
     const error = await response.json();
     return Promise.reject({
       status: response.status,
-      message: error.message || "Error api",
+      message: error.error || "Error api",
     });
   }
   const data = await response.json();

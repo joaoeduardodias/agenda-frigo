@@ -61,8 +61,6 @@ export async function POST(req: NextRequest) {
         },
       },
     });
-    console.log("sector " + sector);
-    console.log(user);
 
     return NextResponse.json({ user }, { status: 201 });
   } catch (error) {

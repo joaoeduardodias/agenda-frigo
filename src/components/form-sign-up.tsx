@@ -28,8 +28,13 @@ const signUpSchema = z.object({
   password: z
     .string({ message: "Digite sua senha" })
     .min(8, { message: "A  senha deve ter no mínimo 08 caracteres" }),
-  contact: z.string({ message: "Digite seu ramal" }),
-  contact_secondary: z.string().optional(),
+  contact: z
+    .string({ message: "Digite seu ramal" })
+    .transform((value) => value.replace(/\D/g, "")),
+  contact_secondary: z
+    .string()
+    .optional()
+    .transform((value) => value?.replace(/\D/g, "")),
   enterprise: z.string({ message: "Selecione sua empresa" }),
   sector: z.string({ message: "Selecione o seu setor" }),
 });
@@ -51,8 +56,16 @@ export function FormSignUp() {
   const queryClient = useQueryClient();
   const createUserMutation = useMutation({
     mutationFn: createUser,
-    onSuccess: async ({ message }) => {
-      switch (message) {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["get-users"] });
+      toast.success("Usuário cadastrado com sucesso", {
+        richColors: true,
+        position: "top-right",
+        icon: <CircleCheck />,
+      });
+    },
+    onError: (error) => {
+      switch (error.message) {
         case "User already exists":
           toast.error("Usuário já existente!", {
             richColors: true,
@@ -70,38 +83,29 @@ export function FormSignUp() {
           break;
 
         default:
-          await queryClient.invalidateQueries({ queryKey: ["get-users"] });
-          toast.success("Usuário cadastrado com sucesso", {
-            richColors: true,
-            position: "top-right",
-            icon: <CircleCheck />,
-          });
+          toast.error(
+            "Erro encontrado, por favor tente novamente: " + error.message,
+            {
+              richColors: true,
+              position: "top-right",
+              icon: <CircleX />,
+            }
+          );
+          console.log("error" + error.message);
       }
-    },
-    onError: (error) => {
-      toast.error(
-        "Erro encontrado, por favor tente novamente: " + error.message,
-        {
-          richColors: true,
-          position: "top-right",
-          icon: <CircleX />,
-        }
-      );
-      console.log("error" + error.message);
     },
   });
 
-  const { data, isLoading } = useQuery({
+  const { data: enterprises, isLoading } = useQuery({
     queryKey: ["get-enterprises"],
     queryFn: getEnterprises,
     staleTime: 1000 * 60 * 60, // 1hour
   });
 
   const enterpriseId = watch("enterprise");
-  const { data: dataSector, isLoading: loadingSectors } = useQuery({
+  const { data: sectors, isLoading: loadingSectors } = useQuery({
     queryKey: ["get-sectors", enterpriseId],
     queryFn: () => getSectorsByEnterprise({ enterpriseId }),
-    staleTime: 1000 * 60 * 60, // 1hour
     enabled: !!enterpriseId,
   });
   function handleSignUp(data: SignUpData) {
@@ -209,7 +213,7 @@ export function FormSignUp() {
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
-                {data?.enterprises.map((enterprise) => {
+                {enterprises?.enterprises.map((enterprise) => {
                   return (
                     <SelectItem key={enterprise.id} value={enterprise.id}>
                       {enterprise.name} - {enterprise.city} {enterprise.uf}
@@ -242,7 +246,7 @@ export function FormSignUp() {
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
-                {dataSector?.sectors.map((sector) => {
+                {sectors?.sectors.map((sector) => {
                   return (
                     <SelectItem key={sector.id} value={sector.name}>
                       {sector.name}
