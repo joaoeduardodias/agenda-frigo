@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         { status: 405 }
       );
     }
-    const token = jwt.sign({ userId: user.id }, "termo-frigo-2024", {
+    const token = jwt.sign({ userId: user.id }, "agenda-frigo", {
       expiresIn: "10h",
     });
 

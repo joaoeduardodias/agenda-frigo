@@ -17,9 +17,9 @@ import {
 export function Header() {
   return (
     <header className="flex items-center justify-between shadow-sm border-b p-6 gap-4">
-      <div className="flex gap-4">
-        <Phone className="size-6 text-gray-600" />
-        <h1 className="text-xl text-gray-600 font-semibold">Agenda</h1>
+      <div className="flex gap-x-3 text-gray-600">
+        <Phone className="size-5 mt-0.5 " />
+        <h1 className="text-xl leading-6  font-semibold">Agenda</h1>
       </div>
 
       <div className="flex gap-4">
