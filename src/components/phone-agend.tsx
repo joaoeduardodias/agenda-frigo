@@ -1,5 +1,6 @@
 "use client";
 
+import { getUsers } from "@/app/http/get-users";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,6 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { filterContacts } from "@/utils/filter-contacts";
+import { formatPhoneNumber } from "@/utils/format-phone-numbers";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 const contatos = [
@@ -61,21 +65,37 @@ export function PhoneAgend() {
   const [setorFiltro, setSetorFiltro] = useState("Todos");
   const [busca, setBusca] = useState("");
 
-  const empresas = [
+  const {
+    data: contacts,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["get-users"],
+    queryFn: getUsers,
+  });
+
+  const enterprises = [
     "Todas",
-    ...Array.from(new Set(contatos.map((c) => c.empresa))),
+    ...Array.from(new Set(contacts?.map((c) => c.enterprise))),
   ];
-  const setores = [
+  const sectors = [
     "Todos",
-    ...Array.from(new Set(contatos.map((c) => c.setor))),
+    ...Array.from(new Set(contacts?.map((c) => c.sector))),
   ];
 
-  const contatosFiltrados = contatos.filter(
-    (c) =>
-      (empresaFiltro === "Todas" || c.empresa === empresaFiltro) &&
-      (setorFiltro === "Todos" || c.setor === setorFiltro) &&
-      (c.nome.toLowerCase().includes(busca.toLowerCase()) ||
-        c.telefone.includes(busca))
+  // const filterContacts = contacts?.filter(
+  //   (c) =>
+  //     (empresaFiltro === "Todas" || c.enterprise === empresaFiltro) &&
+  //     (setorFiltro === "Todos" || c.sector === setorFiltro) &&
+  //     (c.name.toLowerCase().includes(busca.toLowerCase()) ||
+  //       String(c.contact).includes(busca) ||
+  //       String(c.contact_secondary).includes(busca))
+  // );
+  const dataFiltered = filterContacts(
+    contacts!,
+    empresaFiltro,
+    setorFiltro,
+    busca
   );
 
   return (
@@ -93,9 +113,9 @@ export function PhoneAgend() {
             <SelectValue placeholder="Filtrar por Empresa" />
           </SelectTrigger>
           <SelectContent>
-            {empresas.map((empresa) => (
-              <SelectItem key={empresa} value={empresa}>
-                {empresa}
+            {enterprises.map((enterprise) => (
+              <SelectItem key={enterprise} value={enterprise}>
+                {enterprise}
               </SelectItem>
             ))}
           </SelectContent>
@@ -105,9 +125,9 @@ export function PhoneAgend() {
             <SelectValue placeholder="Filtrar por Setor" />
           </SelectTrigger>
           <SelectContent>
-            {setores.map((setor) => (
-              <SelectItem key={setor} value={setor}>
-                {setor}
+            {sectors.map((sector) => (
+              <SelectItem key={sector} value={sector}>
+                {sector}
               </SelectItem>
             ))}
           </SelectContent>
@@ -119,18 +139,22 @@ export function PhoneAgend() {
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
+              <TableHead>Ramal</TableHead>
               <TableHead>Telefone</TableHead>
-              <TableHead>Empresa</TableHead>
               <TableHead>Setor</TableHead>
+              <TableHead>Empresa</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {contatosFiltrados.map((contato) => (
-              <TableRow key={contato.id}>
-                <TableCell>{contato.nome}</TableCell>
-                <TableCell>{contato.telefone}</TableCell>
-                <TableCell>{contato.empresa}</TableCell>
-                <TableCell>{contato.setor}</TableCell>
+            {dataFiltered?.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.contact}</TableCell>
+                <TableCell>
+                  {formatPhoneNumber(String(user.contact_secondary))}
+                </TableCell>
+                <TableCell>{user.sector}</TableCell>
+                <TableCell>{user.enterprise}</TableCell>
               </TableRow>
             ))}
           </TableBody>

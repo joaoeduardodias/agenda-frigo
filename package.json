@@ -30,6 +30,7 @@
     "clsx": "^2.1.1",
     "cmdk": "1.0.0",
     "docker-compose": "^1.1.0",
+    "fuse.js": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.451.0",
     "next": "14.2.15",
