@@ -15,7 +15,7 @@ const authOptions: NextAuthOptions = {
 
         try {
           const response = await fetch(
-            `${process.env.NEXTAUTH_URL}/api/users/sign-in`,
+            `${process.env.NEXTAUTH_URL}/api/sign-in`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -62,7 +62,6 @@ const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  debug: true,
 };
 
 const handler = NextAuth(authOptions);

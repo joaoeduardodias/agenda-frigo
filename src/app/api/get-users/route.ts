@@ -15,6 +15,8 @@ export async function GET() {
         enterprise: {
           select: {
             name: true,
+            city: true,
+            uf: true,
           },
         },
         sectors: {
@@ -30,7 +32,7 @@ export async function GET() {
       email: user.email,
       contact: user.contact,
       contact_secondary: user.contact_secondary,
-      enterprise: user.enterprise.name,
+      enterprise: `${user.enterprise.name} - ${user.enterprise.city} ${user.enterprise.uf}`,
       sector: user.sectors.name,
     }));
     return NextResponse.json(formattedUsers, { status: 200 });
