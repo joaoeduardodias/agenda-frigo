@@ -15,7 +15,7 @@ const signInSchema = z.object({
     .email({ message: "Digite um email válido." }),
   password: z
     .string({ message: "Digite sua senha" })
-    .min(8, { message: "A  senha deve ter no mínimo 08 caracteres" }),
+    .min(8, { message: "A  senha deve ter no mínimo 08 caracteres." }),
 });
 type SignInData = z.infer<typeof signInSchema>;
 
