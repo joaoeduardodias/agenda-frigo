@@ -59,7 +59,7 @@ export function PhoneAgend() {
       <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
         <Input
           type="text"
-          placeholder="searchr por nome ou telefone"
+          placeholder="Busca por nome ou telefone"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="md:w-1/3"
@@ -97,6 +97,7 @@ export function PhoneAgend() {
               <TableHead>Nome</TableHead>
               <TableHead>Ramal</TableHead>
               <TableHead>Telefone</TableHead>
+              <TableHead>E-mail</TableHead>
               <TableHead>Setor</TableHead>
               <TableHead>Empresa</TableHead>
             </TableRow>
@@ -109,6 +110,7 @@ export function PhoneAgend() {
                 <TableCell>
                   {formatPhoneNumber(String(user.contact_secondary))}
                 </TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell>{user.sector}</TableCell>
                 <TableCell>{user.enterprise}</TableCell>
               </TableRow>

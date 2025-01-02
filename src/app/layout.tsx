@@ -34,7 +34,7 @@ export default function RootLayout({
         >
           <ReactQueryProvider>
             <SidebarProvider>
-              <Toaster />
+              <Toaster richColors expand />
               <div className="h-screen w-full flex flex-col">
                 <Header />
                 {children}

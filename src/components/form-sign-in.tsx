@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleX } from "lucide-react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -19,6 +20,7 @@ const signInSchema = z.object({
 type SignInData = z.infer<typeof signInSchema>;
 
 export function FormSignIn() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -40,6 +42,8 @@ export function FormSignIn() {
           position: "top-right",
           icon: <CircleX />,
         });
+      } else {
+        router.push("/");
       }
     } catch (error) {
       toast.error("Erro encontrado, por favor tente novamente: " + error, {

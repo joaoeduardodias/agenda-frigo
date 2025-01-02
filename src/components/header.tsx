@@ -1,6 +1,7 @@
 "use client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Phone } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { FormCreateEnterprise } from "./form-create-enterprise";
 import { FormSignIn } from "./form-sign-in";
@@ -15,6 +16,8 @@ import {
 } from "./ui/sheet";
 
 export function Header() {
+  const { data: session } = useSession();
+
   return (
     <header className="flex items-center justify-between shadow-sm border-b p-6 gap-4">
       <div className="flex gap-x-3 text-gray-600">
@@ -23,26 +26,28 @@ export function Header() {
       </div>
 
       <div className="flex gap-4">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Link
-              href="#"
-              className="text-muted-foreground tracking-tight text-sm hover:text-primary"
-            >
-              Criar Empresa
-            </Link>
-          </SheetTrigger>
-          <SheetContent>
-            <SheetHeader className="mt-4 ">
-              <SheetTitle>Criar empresa</SheetTitle>
-              <SheetDescription>
-                Adicione sua empresa, para que seus contatos possam se vincular
-                a ela.
-              </SheetDescription>
-            </SheetHeader>
-            <FormCreateEnterprise />
-          </SheetContent>
-        </Sheet>
+        {session && (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Link
+                href="#"
+                className="text-muted-foreground tracking-tight text-sm hover:text-primary"
+              >
+                Criar Empresa
+              </Link>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader className="mt-4 ">
+                <SheetTitle>Criar empresa</SheetTitle>
+                <SheetDescription>
+                  Adicione sua empresa, para que seus contatos possam se
+                  vincular a ela.
+                </SheetDescription>
+              </SheetHeader>
+              <FormCreateEnterprise />
+            </SheetContent>
+          </Sheet>
+        )}
 
         <Sheet>
           <SheetTrigger asChild>
@@ -50,7 +55,7 @@ export function Header() {
               href="#"
               className="text-muted-foreground tracking-tight text-sm hover:text-primary"
             >
-              Adicionar
+              Sign-in
             </Link>
           </SheetTrigger>
           <SheetContent>

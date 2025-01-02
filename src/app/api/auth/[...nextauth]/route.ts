@@ -12,22 +12,26 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials) return null;
+
         try {
-          const response = await fetch("/api/users/sign-in", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-          });
+          const response = await fetch(
+            `${process.env.NEXTAUTH_URL}/api/users/sign-in`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+            }
+          );
 
           if (response.status !== 200) return null;
 
           const data = await response.json();
           if (!data.token || !data.role) return null;
 
-          const parseJWT = await JSON.parse(
+          const parseJWT = JSON.parse(
             Buffer.from(data.token.split(".")[1], "base64").toString()
           );
 
@@ -50,24 +54,15 @@ const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
       }
-
       return token;
     },
     async session({ session, token }) {
       session.id = token.id as string;
       session.role = token.role as string;
-
       return session;
     },
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      return baseUrl;
-    },
   },
-  pages: {
-    signIn: "/",
-    signOut: "/",
-  },
+  debug: true,
 };
 
 const handler = NextAuth(authOptions);
