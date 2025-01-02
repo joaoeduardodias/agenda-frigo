@@ -83,12 +83,17 @@ export function FormSignIn() {
           </p>
         )}
       </div>
-      <div className="flex-1 mt-3">
-        <span>Esqueci</span>
+      <div className="flex-1 mt-3 flex flex-col">
         <Button type="submit" className="w-full">
           Entrar
           <span className="sr-only">Sign-in</span>
         </Button>
+        {/* <Link
+          href="/forgot-password"
+          className="text-sm cursor-pointer hover:text-primary text-center"
+        >
+          Esqueci minha senha
+        </Link> */}
       </div>
     </form>
   );
